@@ -75,14 +75,5 @@
             ✅ rm -iv file.txt  (shows what is deleted, asks confirmation)
             ✅ rm -rf dir (deletes everything inside immediately)
 
-    14. find (find [path] [condition], [-name , type -d, type -f])
-    15. help (help command(inbuilt), --help(executables))
-    16. man (manual man command)
-    17. whatis (short desc)
-    18. alias 
-        - temporary alias ll='ls -la',unalias ll 
-        - permanent nano ~/.bashrc, alias ll='ls -la'
-          alias update='sudo apt update && sudo apt upgrade'
-          source ~/.bashrc
 
     ✅ 19. exit (Ends the shell → returns to previous shell or closes terminal, logout → also exits (mainly for login shells))
