@@ -1,0 +1,503 @@
+# =========================================
+# 🚀 STAGE 0: INITIAL SETUP
+# =========================================
+
+# Create project folder
+mkdir auth-service
+cd auth-service
+
+# Initialize git repo
+git init
+
+# Create initial files
+touch app.py auth.py
+
+# Add basic content
+echo "print('Auth Service Running')" > app.py
+echo "# Auth logic here" > auth.py
+
+# Stage files
+git add .
+
+# First commit
+git commit -m "chore: initial project setup with app and auth modules"
+
+
+# =========================================
+# 🚀 STAGE 1: FEATURE DEVELOPMENT (LOGIN)
+# =========================================
+
+# Create feature branch
+git switch -c feature/login
+
+# Add login functionality
+echo "
+def login(user, password):
+    return 'login success'
+" >> auth.py
+
+# Commit 1 (bad practice - we will fix later)
+git add .
+git commit -m "added login"
+
+# Modify again (simulate messy commit)
+echo "# TODO: add validation" >> auth.py
+
+git add .
+git commit -m "update"
+
+# 🔥 Clean history using interactive rebase
+git rebase -i HEAD~2
+
+# 👉 Change:
+# pick → squash (combine commits)
+# reword → better commit message
+
+# Final message:
+# feat(auth): add basic login functionality
+
+
+# =========================================
+# 🚀 STAGE 2: SIMULATE TEAM CHANGE (CONFLICT)
+# =========================================
+
+# Switch to main branch
+git switch main
+
+# Simulate another developer change
+echo "
+def login(user, password):
+    return 'login failed'
+" >> auth.py
+
+git add .
+git commit -m "feat(auth): update login logic (other dev)"
+
+# Go back to your feature branch
+git switch feature/login
+
+
+# =========================================
+# 🚀 STAGE 3: REBASE + CONFLICT RESOLUTION
+# =========================================
+
+# Rebase onto updated main
+git fetch origin 2>/dev/null
+git rebase main
+
+# ❗ Conflict will occur in auth.py
+
+# 👉 Open auth.py and fix manually:
+# Keep correct logic (combine if needed)
+
+# After fixing:
+git add auth.py
+git rebase --continue
+
+# If multiple conflicts → repeat
+
+
+# =========================================
+# 🚀 STAGE 4: PUSH & PR FLOW
+# =========================================
+
+# Push feature branch
+git push -u origin feature/login 2>/dev/null || git push -u origin feature/login --force-with-lease
+
+# (Simulated PR review)
+# Reviewer says: "Improve validation"
+
+# Make changes
+echo "
+def validate(user):
+    return True
+" >> auth.py
+
+git add .
+git commit -m "feat(auth): add validation logic"
+
+# Rebase to clean commits
+git rebase -i HEAD~2
+
+# Push updated branch
+git push --force-with-lease
+
+
+# =========================================
+# 🚀 STAGE 5: INTRODUCE BUG 😈
+# =========================================
+
+# Switch to main (simulate merge)
+git switch main
+git merge feature/login
+
+# Introduce bug
+echo "
+def login(user, password):
+    return None  # BUG
+" >> auth.py
+
+git add .
+git commit -m "feat(auth): modify login (BUG INTRODUCED)"
+
+
+# =========================================
+# 🚀 STAGE 6: FIND BUG USING BISECT 🔍
+# =========================================
+
+git bisect start
+
+# Current commit is bad
+git bisect bad
+
+# Mark older commit as good
+git bisect good HEAD~3
+
+# 👉 Now Git will checkout commits
+# Run manually:
+# python app.py (or check logic)
+
+# Mark results:
+git bisect good   # or bad
+
+# Repeat until Git finds bad commit
+
+# Reset bisect
+git bisect reset
+
+
+# =========================================
+# 🚀 STAGE 7: USE BLAME 🕵️
+# =========================================
+
+# Check who introduced bug
+git blame auth.py
+
+
+# =========================================
+# 🚀 STAGE 8: DISASTER RECOVERY 💀
+# =========================================
+
+# Accidentally delete commits
+git reset --hard HEAD~3
+
+# 😱 Recover using reflog
+git reflog
+
+# Find lost commit and restore
+git reset --hard <commit_id>
+
+
+# =========================================
+# 🚀 STAGE 9: SAFER RECOVERY
+# =========================================
+
+# Instead of reset, create recovery branch
+git checkout -b recovery <commit_id>
+
+
+# =========================================
+# 🚀 STAGE 10: CLEANUP
+# =========================================
+
+# Delete feature branch
+git branch -d feature/login
+
+# View full history
+git log --graph --oneline --all
+
+
+🚀 GOD-LEVEL GIT NOTES
+
+
+📌 1. What is Git
+    Git = Distributed Version Control System
+
+    👉 Tracks changes
+    👉 Enables collaboration
+    👉 Allows time travel (undo anything)
+
+
+
+📌 2. Core Architecture (INTERVIEW GOLD 🧠)
+    Working Directory → Staging Area → Repository
+    Working Directory → your files
+    Staging Area (Index) → prepared changes
+    Repository (.git) → committed history
+    🔥 Important Pointer
+    HEAD → points to current commit
+    Branch → movable pointer
+
+
+📌 3. Setup (One-time)
+    git config --global user.name "Your Name"
+    git config --global user.email "your@email.com"
+    git config --list
+
+
+📌 4. Initialize / Clone
+    git init
+    git clone <url>
+
+
+📌 5. Core Workflow
+    edit → add → commit → push
+
+
+📌 6. Basic Commands
+    git status
+    git add file.txt
+    git add .
+    git commit -m "message"
+    git log --oneline
+
+
+📌 7. Understanding Commit
+A commit is a snapshot of your project
+
+Contains:
+    Hash (ID)
+    Author
+    Message
+    Pointer to previous commit
+
+
+📌 8. Undo Changes (🔥 MUST MASTER)
+    🔹 Undo file changes
+    git restore file.txt
+
+    🔹 Unstage file
+    git reset file.txt
+
+    🔹 Undo last commit (keep changes)
+    git reset --soft HEAD~1
+
+    🔹 Remove commit completely ⚠️
+    git reset --hard HEAD~1
+
+
+📌 9. Revert (SAFE for Teams)
+git revert <commit_id>
+👉 Creates a new commit (does NOT rewrite history)
+
+
+
+📌 10. Branching
+    git branch feature
+    git switch feature
+    git checkout master
+
+
+📌 11. Merge
+    git merge feature
+    Types:
+    Fast-forward
+    3-way merge
+
+
+📌 12. Merge Conflict
+<<<<<<< HEAD
+your code
+=======
+other code
+>>>>>>> branch
+
+👉 Fix →
+git add .
+git commit
+
+
+📌 13. Rebase (🔥 VERY IMPORTANT)
+git rebase main
+
+👉 Moves your commits on top of main
+
+🔥 Rebase vs Merge
+Merge	Rebase
+Keeps history	Linear history
+Safe	Rewrites history
+
+👉 Rule:
+
+Use merge in shared branches
+Use rebase before PR
+
+
+📌 14. Interactive Rebase (GOD LEVEL 🔥)
+git rebase -i HEAD~3
+
+Options:
+
+squash → combine commits
+reword → edit message
+drop → delete commit
+
+👉 Used to clean history before PR
+
+
+
+📌 15. Amend Commit
+git commit --amend
+
+👉 Fix last commit message or add changes
+
+
+
+📌 16. Cherry Pick
+git cherry-pick <commit_id>
+
+👉 Apply specific commit from another branch
+
+
+
+📌 17. Stash (Temporary Save)
+git stash
+git stash list
+git stash pop
+git stash apply
+git stash drop
+
+
+📌 18. Remote Repositories
+git remote add origin <url>
+git push -u origin main
+git pull
+git fetch
+🔥 Fetch vs Pull
+fetch → download only
+pull → fetch + merge
+
+
+📌 19. Delete Branch
+git branch -d feature
+git branch -D feature   # force delete
+
+
+📌 20. Logs & Debugging
+git log --graph --oneline --all
+git diff
+git show <commit_id>
+
+
+📌 21. Power Tools (🔥 ELITE)
+🔹 Reflog (LIFE SAVER 💀)
+git reflog
+
+👉 Recover deleted commits
+
+🔹 Bisect (Find Bug Fast)
+git bisect start
+
+👉 Binary search for bug
+
+🔹 Blame
+git blame file.txt
+
+👉 Who changed what
+
+
+
+📌 22. .gitignore
+node_modules/
+.env
+*.log
+
+
+📌 23. Pull Request Workflow (REAL WORLD 🚀)
+git checkout -b feature
+git add .
+git commit -m "feature"
+git push origin feature
+
+👉 Then:
+
+Open PR
+Code review
+Merge
+
+
+📌 24. Branch Strategy (INDUSTRY)
+main → production
+develop → integration
+feature/* → features
+hotfix/* → urgent fixes
+
+
+📌 25. Real Project Flow
+git clone repo
+git checkout -b feature
+
+# work
+git add .
+git commit -m "feature added"
+git push origin feature
+
+# PR merged
+git checkout main
+git pull
+
+
+📌 26. Common Interview Scenarios
+🔥 Undo pushed commit
+git revert <commit_id>
+🔥 Fix wrong commit message
+git commit --amend
+🔥 Recover deleted commit
+git reflog
+git checkout <commit_id>
+🔥 Move commit to another branch
+git cherry-pick <commit_id>
+
+
+📌 ⚡ PRO LEVEL TIPS
+Commit small & often ✔️
+Write meaningful messages ✔️
+Never use --hard blindly ❌
+Always pull before push ✔️
+Use branches for every feature ✔️
+Rebase before PR ✔️
+
+
+📌 🧠 MOST ASKED INTERVIEW QUESTIONS
+Be ready to answer:
+
+Difference: reset vs revert
+Both commands "undo" changes, but they do so in fundamentally different ways.
+git reset: Moves the current branch pointer backward to a previous commit. It effectively "erases" history from the branch.
+Best for: Local changes that haven't been shared with others.
+
+git revert: Creates a new commit that does the exact opposite of the targeted commit. It doesn't erase history; it adds to it.
+Best for: Public branches, as it doesn't rewrite history and is safer for collaborators
+
+
+Difference: merge vs rebase
+git merge: Combines the histories of two branches. It creates a "merge commit" that has two parent commits. It is non-destructive and preserves the chronological order of how things happened.
+git rebase: Moves or "slides" the entire sequence of commits from one branch onto the tip of another. It rewrites history to create a linear path.
+Pro-tip: Never rebase branches that have been pushed to a public repository.
+
+What is staging area?
+The Staging Area (or "Index") is a middle ground between your working directory and your repository.
+When you use git add, you are telling Git, "I want these specific changes to be part of my next snapshot." This allows you to craft precise commits even if you've modified ten different files but only want to save changes for two of them right now.
+
+What is conflict? how to resolve?
+A Merge Conflict occurs when Git cannot automatically determine which changes to keep—usually because two people modified the same line in the same file, or one person deleted a file that another person was editing.
+
+How to resolve:
+Locate: Git will mark the conflict in the file with arrows: <<<<<<< HEAD, =======, and >>>>>>>.
+Edit: Manually choose which code to keep (or combine them) and remove the Git markers.
+Stage: Run git add <file> to mark it as resolved.
+Commit: Finalize the merge with git commit.
+
+fetch vs pull
+git fetch:  
+git pull: Does a git fetch followed immediately by a git merge. It updates your local code with the remote version.
+
+What happens in git commit?
+When you run git commit, Git takes a snapshot of everything currently in the staging area.
+
+Creates a Tree Object: It maps the folder structure and files.
+Generates a SHA-1 Hash: A unique ID (e.g., f7a2b3...) is generated based on the content and metadata (author, date, message).
+Updates the Pointer: The HEAD pointer moves forward to this new commit, making it the latest version of your current branch.
+
+
+

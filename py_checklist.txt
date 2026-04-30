@@ -1,0 +1,163 @@
+🔹 1. CORE BASICS (Must be 100% solid)
+Variables & Data Types
+Type casting (int(), str() etc.)
+Input / Output
+Operators (all types)
+
+
+🔹 2. STRINGS (VERY IMPORTANT FOR DSA)
+String slicing
+Immutability
+Common methods:
+.lower(), .upper()
+.strip(), .split(), .join()
+.replace(), .find()
+
+
+🔹 3. LISTS (MOST IMPORTANT DS STRUCTURE IN PYTHON)
+Indexing / slicing
+Methods:
+.append(), .pop(), .insert()
+.sort(), .reverse()
+List comprehension 🔥
+[x*x for x in range(10)]
+
+
+🔹 4. TUPLES, SETS, DICTIONARIES
+Tuple
+Immutable list
+Packing / unpacking
+Set
+Unique elements
+Fast lookup
+set(), add(), remove()
+Dictionary 🔥🔥 (VERY IMPORTANT)
+Key-value mapping
+Methods:
+dict.get()
+dict.keys()
+dict.values()
+
+
+🔹 5. LOOPS & CONTROL FLOW
+for, while
+break, continue, pass
+Nested loops
+
+
+
+🔹 6. FUNCTIONS
+Function definition
+Parameters:
+Default args
+Keyword args
+Return values
+Advanced:
+*args, **kwargs
+Lambda functions
+lambda x: x*x
+
+
+🔹 7. RECURSION (Important for DSA)
+Base case
+Stack understanding
+
+
+
+🔹 8. FILE HANDLING
+with open("file.txt", "r") as f:
+    data = f.read()
+Modes: r, w, a
+
+
+🔹 9. OOPS (VERY IMPORTANT FOR INTERVIEWS)
+Classes & Objects
+Constructor (__init__)
+Inheritance
+Encapsulation
+Polymorphism
+
+
+🔹 10. ERROR HANDLING
+try:
+    ...
+except:
+    ...
+finally:
+    ...
+
+    
+🔹 11. IMPORTANT BUILT-IN FUNCTIONS (MUST KNOW)
+len()
+sum()
+min(), max()
+sorted()
+map(), filter()
+zip()
+
+
+
+🔹 12. ITERATORS & GENERATORS (ADVANCED + USEFUL)
+yield
+
+
+🔹 13. TIME COMPLEXITY AWARENESS (CRITICAL)
+
+Know complexity of:
+
+List operations → O(n)
+Dict lookup → O(1)
+Set lookup → O(1)
+
+
+🔹 14. MODULES & PACKAGES
+Importing:
+import math
+from math import sqrt
+Create your own modules
+
+
+🔹 15. VIRTUAL ENV (BASIC IDEA)
+python -m venv env
+
+
+🔹 16. USEFUL STANDARD LIBRARIES
+You don’t need ALL, just these:
+
+math
+collections 🔥 (VERY IMPORTANT)
+Counter
+deque
+defaultdict
+itertools
+heapq (for priority queue)
+
+
+🔹 17. PYTHONIC CODING (THIS MAKES YOU STRONG)
+List comprehension instead of loops
+Clean readable code
+Avoid unnecessary variables
+
+
+🔹 18. DEBUGGING SKILLS
+Reading errors
+Using print() effectively
+Understanding stack trace
+
+
+🔹 19. BASIC CLI / SCRIPTING
+Run scripts: python file.py
+
+🔹 20. BONUS (IF YOU WANT EDGE)
+Decorators (optional)
+Context managers
+Dataclasses
+
+
+🎯 FINAL CHECK (VERY IMPORTANT)
+If you can:
+Solve DSA problems without Googling syntax ✅
+Use dict, set, list efficiently ✅
+Write clean functions quickly ✅
+
+👉 Then Python is DONE for you

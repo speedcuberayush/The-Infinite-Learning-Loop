@@ -1,0 +1,404 @@
+========================
+MAIN CONTENT
+========================
+- Introduction , GAP
+- Workload Replay, Oakgate DT migration to CVF
+- Write Amplification 
+- FFU 
+- Powercycle 2 types : GSD(graceful shutdown) , UGSD(ungraceful) 
+- RESETS (CNTRL, SUBSYSTEM, PCIE HOT,COLD, WARM)
+- USB Reset ->  SCSI Reset Types: ( LUN Reset ,Target Reset, Bus Reset)
+- LUNs in SCSI (Logical Unit Number), Descriptors in USB, TMIU
+- Commands and their role 
+- Endpoints
+
+====================================================================================
+  
+1. Write Amplification : Write amplification is when the SSD writes more data internally than what the host requests, mainly due to NAND erase-before-write constraints and garbage collection.
+
+- Field firmware update : Ffu is like update for device, Write buffer commands are shot to device and after power cycle only device gets updated to new fw. FFU is simply updateing lets say new firmware for device under test lets say new features given by firmware team or update to a stable firmware is this good. When you are testing FFU, always check the "Firmware Slot." Many modern devices have multiple "slots" (like Slot 1, Slot 2). FFU allows you to download a new version into Slot 2 while Slot 1 is still running. This is a safety net; if Slot 2 fails to boot, the device can fall back to the "Golden" firmware in Slot 1 so the device doesn't become a "brick."
+
+
+- Reset : Ctrl reset, Subsystem reset, Pcie hot reset, Reset power is not cut, Powercycle power is cut
+- Reset is like error handling mechanism from host where queues might be deleted and created again
+- In power cycle is when is remove drive from host maa
+
+
+RAID 0: divide data (A → A1, A2 across disks)
+RAID 1: copy data (A → A on multiple disks)
+RAID 2: bit-level split + parity/error bits
+RAID 3: byte-level split + 1 dedicated parity disk
+RAID 4: block-level split + 1 dedicated parity disk
+RAID 5: block-level + distributed parity (no separate disk, parity mixed like Ap)
+RAID 6: like RAID 5 + 2 parity blocks (can survive 2 disk failures)
+
+
+🔥 1. LUNs in SCSI (Logical Unit Number)
+LUN identifies a logical device behind a target. In SCSI, one target (device) can expose multiple logical units
+Each unit = separate storage entity One USB drive → multiple partitions (conceptually similar)
+RAID → multiple LUNs, Addressing: Host → Target → LUN, 
+        Interview line: “LUN is used to identify different logical storage units within a SCSI target device.”
+
+🔥 2. Descriptors in USB
+
+Descriptors define device information during enumeration
+
+Types (IMPORTANT):
+Device Descriptor → vendor ID, product ID
+Configuration Descriptor → power, interfaces
+Interface Descriptor → function (mass storage, HID)
+Endpoint Descriptor → endpoints details
+
+
+During enumeration (device plug-in)
+“USB descriptors are structured data that describe the capabilities and configuration of a USB device to the host.”
+
+
+🔥 3. TMIU (Task Management Information Unit) : Abort task, Reset LUN, Clear task set -> Like control commands for managing ongoing operations
+
+
+========================
+STORAGE + USB + NVMe REVISION SHEET
+========================
+
+------------------------
+1. NAND BASICS
+------------------------
+- Cell stores charge → threshold voltage (Vt)
+- More charge → higher Vt → logical 0
+- Less charge → lower Vt → logical 1
+- Erase = all 1s (empty state)
+- Programming = 1 → 0 (add charge)
+- Cannot do 0 → 1 without erase (block erase)
+
+Types:
+- SLC (1 bit) → fast, durable
+- MLC/TLC/QLC → slower, more errors
+
+Errors:
+- Retention
+- Read disturb
+- Program disturb
+
+------------------------
+2. FTL (Flash Translation Layer)
+------------------------
+- Logical → Physical mapping
+- No in-place update → out-of-place writes
+
+Key:
+- Wear leveling (static + dynamic)
+- Garbage collection (GC)
+
+Overwrite flow:
+- Write new page
+- Mark old invalid
+- GC cleans blocks
+
+------------------------
+3. WRITE AMPLIFICATION
+------------------------
+WAF = NAND writes / Host writes
+
+Cause:
+- GC + out-of-place updates
+
+Impact:
+- Performance drop
+- Reduced endurance
+
+------------------------
+4. SSD SLOWDOWN
+------------------------
+- Garbage collection
+- Fragmentation
+- SLC cache full
+- High WAF
+- Thermal throttling
+
+------------------------
+5. NVMe BASICS
+------------------------
+- Protocol over PCIe
+- High parallelism
+
+Queues:
+- Admin Queue (1) → control
+- I/O Queues (many) → data
+
+Queue pair:
+- SQ (submission)
+- CQ (completion)
+
+Flow:
+1. Host writes to SQ
+2. Doorbell notify
+3. Controller executes
+4. DMA to host memory
+5. Completion in CQ
+
+------------------------
+6. PCIe
+------------------------
+- High-speed interface (bus + protocol)
+- Has lanes (x1, x4, x8...)
+- Carries packets (TLPs)
+
+------------------------
+7. USB vs NVMe vs Thunderbolt
+------------------------
+USB:
+- General purpose
+- No PCIe tunneling
+
+NVMe:
+- Protocol for SSD over PCIe
+
+Thunderbolt:
+- Supports PCIe tunneling
+- Carries PCIe + Display + USB
+
+USB4:
+- Based on Thunderbolt
+- PCIe tunneling optional
+
+KEY:
+USB4 doesn’t run NVMe directly
+→ it tunnels PCIe → NVMe runs on PCIe
+
+------------------------
+8. PCIe TUNNELING
+------------------------
+- Encapsulation of PCIe packets over another medium
+- Used in Thunderbolt/USB4
+
+Flow:
+PCIe → encapsulate → send → decapsulate → PCIe
+
+------------------------
+10. USB MODES (IMPORTANT)
+------------------------
+BOT (Bulk Only Transport):
+- 1 command at a time
+- 2 endpoints (IN, OUT)
+- Sequential
+
+UASP:
+- SCSI over USB
+- Multiple commands
+- Parallel
+- 5 endpoints:
+  - Control
+  - Command OUT
+  - Data IN
+  - Data OUT
+  - Status IN
+
+------------------------
+12. USB DESCRIPTORS
+------------------------
+Hierarchy:
+
+Device
+ → Configuration
+   → Interface
+     → Endpoint
+
+Device Descriptor:
+- idVendor, idProduct
+- USB version
+- ONE per device
+
+Configuration:
+- Power info
+- Interfaces
+- Only ONE active
+
+Interface:
+- Functional block
+- Has alternate settings
+
+Endpoint:
+- Data pipe
+- Types:
+  - Control
+  - Bulk (storage)
+  - Interrupt
+  - Isochronous
+
+NOTE:
+- Endpoint 0 always control (no descriptor)
+
+String Descriptor:
+- Human readable info
+
+------------------------
+13. ENUMERATION FLOW
+------------------------
+1. Device connect
+2. Reset
+3. Read device descriptor
+4. Read configuration
+5. Select configuration
+6. SetConfiguration
+7. Ready
+
+
+------------------------
+18. DRAM vs DRAM-LESS
+------------------------
+DRAM:
+- Fast mapping table
+
+DRAM-less:
+- Uses HMB
+- Slower
+
+------------------------
+19. SLC CACHE
+------------------------
+- Temporary fast write buffer
+- After full → slower writes
+
+------------------------
+20. TRIM
+------------------------
+- Host tells SSD unused data
+- Helps GC
+- Reduces WAF
+
+
+
+========================
+END OF REVISION
+========================
+Power management in storage devices involves multiple layers, including NVMe power states, PCIe link power management, and USB suspend states, all of which reduce power consumption at the cost of increased latency.
+
+To efficiently utilize devices, power management mechanisms are used. In NVMe, there are multiple defined power states, and features like APST (Autonomous Power State Transition) allow the device to automatically transition between these states based on workload. The main goal is to reduce power consumption during idle periods while balancing performance, since lower power states introduce higher latency   
+
+
+- PCAP trace, ATB, Lecroy Trace 
+- NAND, firmware intro, what is JTAG 
+- USB, NVMe, PCIe, Commands and their role , flow
+
+- Power Management in storage devices
+
+- ADMIN VS IO Q
+ADMIN Command
+Delete IO Submission Queue
+Create IO Submission Queue
+Get Log Page
+Delete IO Completion Queue
+Create IO Completion Queue
+Identify
+Abort
+Set Features
+Get Features
+Asynchronous Event Request
+Namespace Management
+Firmware Commit (previously called Firmware Activate)
+Firmware Image Download
+Namespace Attachment
+
+
+IO COMMANDS 
+Write 
+Read
+Write Uncorrectable
+Compare
+Write Zeroes
+Dataset Management
+Verify
+Flush
+
+🔥 1. Device not detected (USB) : You plug in USB drive, it’s not detected. What will you do?
+Step 1: Physical layer : Cable / port issue? , Try different system
+Step 2: Enumeration : Check if reset happens, Check descriptors (Device Descriptor request?)
+Step 3: Host logs : OS logs / dmesg, Is device showing unknown?
+Step 4: Protocol level : 
+    USB analyzer (LeCroy trace)
+    Is enumeration failing at:
+    Device descriptor?
+    Configuration?
+Step 5: Firmware : Is firmware corrupted?, Try recovery / FFU
+
+
+🔥 2. SSD performance suddenly drops : Write speed dropped drastically after some time 
+Think in layers:
+    Is SSD near full? → GC heavy
+    SLC cache exhausted?
+    High write amplification?
+    Thermal throttling?
+    Queue depth low?
+
+Validation:
+    Monitor latency
+    Check temperature
+    Check workload pattern
+
+
+🔥 3. FFU fails / device not booting : Firmware update done but device not coming up
+        Check firmware slot mechanism
+        Did it switch to new slot?
+        Fallback to golden firmware?
+        Was power cycle done properly?
+Debug:
+    Logs during firmware commit
+    Version check via Identify
+
+
+🔥 4. NVMe command not completing : Write command sent but no completion
+      Check flow:
+            Submission queue entry written?
+            Doorbell rung?
+            Controller processed?
+            Completion queue updated?
+      Possible issues:
+            CQ not polled
+            Interrupt missing
+            Queue corruption
+            Firmware hang
+
+
+🔥 5. Data corruption observed : Read data doesn’t match written data
+      Check ECC errors
+      NAND issues (retention, disturb)
+      FTL mapping bug
+      Power failure during write
+
+    Tools:
+        Compare patterns
+        Check retry mechanism
+        Firmware logs
+
+🔥 6. USB works in BOT but fails in UASP : UASP uses multiple queues → concurrency issue
+          Endpoint misconfiguration?
+          TMIU handling problem?
+          Firmware not supporting parallel commands
+
+
+🔥 7. High latency spikes
+        Garbage collection running?
+        Wear leveling triggered?
+        Thermal throttling?
+        Queue starvation?
+
+
+🔥 8. After reset, device behaves incorrectly : Reset type? (LUN / target / bus)
+          Queues recreated?
+          State properly reinitialized?
+          Firmware state machine issue?
+
+
+🔥 9. TRIM not improving performance
+            Is TRIM actually reaching device?
+            Firmware using TRIM info?
+            GC policy inefficient?
+            Over-provisioning too low?
+
+🎯 Golden lines (use these)
+“I would debug this layer by layer starting from physical to protocol to firmware.”
+“I would validate this using trace logs like LeCroy or PCAP.”
+“I would check if the issue is reproducible across systems.”
+
+
