@@ -55,10 +55,10 @@
             ✅ mv file1.txt file2.txt dir/ 
             ✅ mv old.txt new.txt 
             ✅ mv dir1 dir2 
-            mv -i file.txt dir/ 
-            mv -f file.txt dir/ 
-            mv -v file.txt dir/ 
-            mv -b file.txt dir/ 
+            ✅ mv -i file.txt dir/ 
+            ✅ mv -f file.txt dir/ 
+            ✅ mv -v file.txt dir/ 
+            ✅ mv -b file.txt dir/ 
             ✅ mv -t dir file1 file2 file3
 
         
