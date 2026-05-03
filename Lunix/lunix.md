@@ -231,11 +231,11 @@
                 - Fast + available everywhere
 
                 vim file.txt
-                    📌 Forward search : /word
-                    📌 Backward search : ?word
-                    🔁 Move between results : n → next, N → previous
-                    h -> left, l -> right, j -> down, k -> up
-                    i -> insert before cursor, a ->	insert after cursor, I -> start of line, A -> end of line
+                    ✅ 📌 Forward search : /word
+                    ✅ 📌 Backward search : ?word
+                    ✅ 🔁 Move between results : n → next, N → previous
+                    ✅ h -> left, l -> right, j -> down, k -> up
+                    ✅ i -> insert before cursor, a ->	insert after cursor, I -> start of line, A -> end of line
                     o -> new line below, O -> new line above
 
                     x -> delete char, dw ->	delete word, dd -> delete line,3dd -> delete 3 lines
