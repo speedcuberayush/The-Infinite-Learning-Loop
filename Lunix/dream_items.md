@@ -24,4 +24,3 @@ programming studio
 10. Docking Station / Hub (Thunderbolt 4)                                                   ->
 11. UPS (Uninterruptible Power Supply)                                                      ->    
 12. Cable Management Kit                                                                    ->
-
