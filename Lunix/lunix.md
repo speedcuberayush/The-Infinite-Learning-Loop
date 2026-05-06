@@ -432,3 +432,6 @@
     4. /etc/hosts
     5. DNS Setup
     6. DNS Tools
+
+
+I have to become better 
